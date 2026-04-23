@@ -1,49 +1,50 @@
-Este es el plan maestro para tu proyecto **CRUDScanisAcademia**. Como tu colaborador de software, he estructurado este plan para que sea ejecutable, escalable y profesional.
+Para elevar tu proyecto **CRUDScanisAcademia** a un nivel profesional, he diseñado una metodología de desarrollo modular. Este enfoque asegura que tu código sea mantenible, escalable y visualmente atractivo.
 
 ---
 
-## 1. Estructura y Configuración Inicial
+## 1. Roadmap del Proyecto (Entorno Profesional)
 
-Para mantener el orden, sigue esta jerarquía en tu entorno de desarrollo:
+### Configuración de Estructura
+En tu terminal:
+```bash
+mkdir xfluttermaria0602
+cd xfluttermaria0602
+flutter create crudscanisacademia
+cd crudscanisacademia
+```
 
-* `xfluttermaria0602/` (Carpeta raíz)
-    * `crudscanisacademia/` (Proyecto Flutter)
-
-### Configuración de `pubspec.yaml`
-Para conectar Firebase con Flutter, añade estas dependencias en tu archivo `pubspec.yaml`:
-
+### Integración de Librerías (`pubspec.yaml`)
+Añade las dependencias necesarias:
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
   firebase_core: ^3.0.0
   cloud_firestore: ^5.0.0
+  google_fonts: ^6.1.0 # Para tipografía moderna
 ```
-*Ejecuta `flutter pub get` en la terminal para instalarlas.*
+*Ejecuta `flutter pub get` después de guardar.*
 
 ---
 
 ## 2. Metodología de Agentes y Roles (Arquitectura)
 
-Para gestionar este proyecto, definiremos los siguientes roles de software:
+Para gestionar este proyecto, definiremos los siguientes agentes:
 
-| Rol | Responsabilidad |
-| :--- | :--- |
-| **Arquitecto de Datos** | Define la estructura de Firestore (Colección: `cursos`). |
-| **Ingeniero UI/UX** | Diseña los Widgets con paleta de colores moderna. |
-| **DevOps Firebase** | Configura `firebase_options.dart` y reglas de seguridad. |
+| Agente | Habilidad (Skill) | Responsabilidad |
+| :--- | :--- | :--- |
+| **Arquitecto de Datos** | Firebase Firestore Logic | Modelado de la colección `Cursos`. |
+| **Ingeniero UI/UX** | Flutter Material Design | Creación de widgets con paleta `Deep Purple` y `Teal`. |
+| **DevOps Specialist** | Firebase CLI / Config | Gestión de `google-services.json` y flujo de CI/CD. |
 
-### Flujo de Trabajo (Pipeline)
-1. **Init:** Configuración de Firebase console.
-2. **Data Layer:** Modelo de datos `Curso`.
-3. **Service Layer:** Métodos CRUD (FireStore).
-4. **UI Layer:** Widgets con temas visuales.
+### Flujo de Trabajo (Antigravity Approach)
+El principio *Antigravity* aquí significa desacoplar la lógica de Firebase del árbol de widgets, permitiendo que la UI "flote" independientemente de la fuente de datos.
 
 ---
 
-## 3. Implementación: Modelo y CRUD (Código Dart)
+## 3. Implementación del CRUD (Archivos Clave)
 
-### Modelo: `curso_model.dart`
+### `lib/models/curso_model.dart`
 ```dart
 class Curso {
   final String id;
@@ -52,90 +53,92 @@ class Curso {
   final String duracion;
 
   Curso({required this.id, required this.nombre, required this.precio, required this.duracion});
-}
-```
 
-### Servicio: `curso_service.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class CursoService {
-  final CollectionReference _db = FirebaseFirestore.instance.collection('Cursos');
-
-  // CREAR
-  Future<void> addCurso(String nombre, double precio, String duracion) => 
-      _db.add({'nombre': nombre, 'precio': precio, 'duracion': duracion});
-
-  // LEER
-  Stream<QuerySnapshot> getCursos() => _db.snapshots();
-
-  // ACTUALIZAR
-  Future<void> updateCurso(String id, String nombre, double precio, String duracion) =>
-      _db.doc(id).update({'nombre': nombre, 'precio': precio, 'duracion': duracion});
-
-  // BORRAR
-  Future<void> deleteCurso(String id) => _db.doc(id).delete();
-}
-```
-
----
-
-## 4. UI: Pantalla Principal con Colores Atractivos
-
-Utilizaremos una paleta vibrante: `#6200EE` (Primario) y `#03DAC6` (Acento).
-
-```dart
-import 'package:flutter/material.dart';
-
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("ScanisAcademia"),
-        backgroundColor: Color(0xFF6200EE),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFF03DAC6),
-        child: Icon(Icons.add),
-        onPressed: () => _mostrarDialogo(context),
-      ),
-      body: _buildListaCursos(),
+  factory Curso.fromFirestore(Map<String, dynamic> data, String id) {
+    return Curso(
+      id: id,
+      nombre: data['nombre'] ?? '',
+      precio: (data['precio'] ?? 0).toDouble(),
+      duracion: data['duracion'] ?? '',
     );
   }
 }
 ```
 
----
+### `lib/services/firestore_service.dart`
+```dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/curso_model.dart';
 
-## 5. Práctica Guiada con "Antigravity"
+class FirestoreService {
+  final CollectionReference _cursosRef = FirebaseFirestore.instance.collection('Cursos');
 
-El concepto de **Antigravity** en desarrollo implica desacoplar la lógica de la UI para que tu aplicación "flote" sin dependencias rígidas.
+  // CREAR
+  Future<void> addCurso(String nombre, double precio, String duracion) =>
+      _cursosRef.add({'nombre': nombre, 'precio': precio, 'duracion': duracion});
 
-### Pasos para el estudiante:
-1.  **Entorno:** Crea tu proyecto usando `flutter create crudscanisacademia`.
-2.  **Firebase:** Ve a [Firebase Console](https://console.firebase.google.com/), crea el proyecto, registra la app y descarga `google-services.json` (Android) o `GoogleService-Info.plist` (iOS).
-3.  **Integración:** Coloca el archivo en `android/app/` o `ios/Runner/`.
-4.  **Inicialización:** En `main.dart`, asegúrate de inicializar:
-    ```dart
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    ```
-5.  **Refactor:** Separa tus archivos en `lib/models`, `lib/services`, y `lib/screens` para mantener el código "ligero".
+  // LEER (Stream para actualización en tiempo real)
+  Stream<List<Curso>> getCursos() {
+    return _cursosRef.snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => Curso.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+        .toList());
+  }
 
----
+  // ACTUALIZAR
+  Future<void> updateCurso(String id, String nombre, double precio, String duracion) =>
+      _cursosRef.doc(id).update({'nombre': nombre, 'precio': precio, 'duracion': duracion});
 
-## Resumen de Estructura de Carpetas
-
-```text
-crudscanisacademia/
-├── lib/
-│   ├── main.dart
-│   ├── models/        # curso_model.dart
-│   ├── services/      # curso_service.dart
-│   └── screens/       # home_screen.dart
-├── android/
-├── ios/
-└── pubspec.yaml
+  // BORRAR
+  Future<void> deleteCurso(String id) => _cursosRef.doc(id).delete();
+}
 ```
 
-¿Te gustaría que profundizáramos en cómo implementar las **reglas de seguridad de Firestore** para proteger tus datos de la academia, o prefieres que generemos los archivos con la interfaz gráfica completa?
+---
+
+## 4. UI: Pantalla Principal (Colores Atractivos)
+
+Utiliza un diseño limpio con `ThemeData` para una experiencia de usuario superior.
+
+```dart
+// Fragmento de UI para la lista
+ListView.builder(
+  itemCount: cursos.length,
+  itemBuilder: (context, index) {
+    final curso = cursos[index];
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      color: Colors.white,
+      child: ListTile(
+        leading: CircleAvatar(backgroundColor: Colors.tealAccent, child: Icon(Icons.book, color: Colors.black)),
+        title: Text(curso.nombre, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+        subtitle: Text("Precio: \$${curso.precio} | Duración: ${curso.duracion}"),
+        trailing: IconButton(icon: Icon(Icons.delete, color: Colors.red), onPressed: () => service.deleteCurso(curso.id)),
+      ),
+    );
+  },
+)
+```
+
+
+
+---
+
+## 5. Práctica Guiada: Metodología Paso a Paso para Estudiantes
+
+1.  **Init Firebase:** Configura el proyecto en la consola, activa *Firestore* en modo prueba.
+2.  **Config:** Ejecuta `flutterfire configure` para generar automáticamente los archivos de inicialización (es la forma más rápida y segura).
+3.  **Modelar:** Define tu objeto `Curso`.
+4.  **Conectar:** Implementa el `FirestoreService`.
+5.  **Visualizar:** Usa `StreamBuilder` en tu pantalla principal para escuchar los cambios en tiempo real sin recargar la pantalla.
+
+---
+
+**Resumen de la estructura de archivos sugerida:**
+* `lib/`
+    * `main.dart` (Configuración inicial)
+    * `models/curso_model.dart`
+    * `services/firestore_service.dart`
+    * `screens/home_screen.dart` (UI)
+
+¿Te gustaría que generemos el código completo del `main.dart` con la inicialización de Firebase incluida, o prefieres que trabajemos en el diseño del formulario para añadir los cursos?
